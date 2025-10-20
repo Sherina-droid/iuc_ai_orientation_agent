@@ -1,0 +1,358 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/context",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -700,
+        -380
+      ],
+      "id": "e69a884b-a235-458d-99b2-89fcc62d11d4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all()[0].json || {};\nconst sessionId = input.sessionId || 'sess-' + Math.random().toString(36).slice(2,10);\n\nreturn [{\n  json: {\n    data: input,\n    sessionId\n\n  }\n}];\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        -380
+      ],
+      "id": "10a85943-0533-4c73-a43e-5580a385d725",
+      "name": "Data"
+    },
+    {
+      "parameters": {
+        "model": "codestral-2501",
+        "options": {
+          "temperature": 0.2,
+          "topP": 0.2,
+          "safeMode": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        160,
+        80
+      ],
+      "id": "1049e378-e951-400e-932d-477a9ac29287",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "yel5RNadpX8Zu3ls",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{$('Process Input').item.json.sessionId}}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        80
+      ],
+      "id": "4b943666-7089-4f0e-8862-f8b1c23af7a1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $node[\"Format Response\"].json.output }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "text/plain"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, GET, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization, Accept"
+              },
+              {
+                "name": "Access-Control-Expose-Headers",
+                "value": "Content-Type"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        -40
+      ],
+      "id": "05adb3c9-0f63-41a3-b8c6-11bbd06eb9aa",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -220,
+        -200
+      ],
+      "id": "1a4aebcc-b53c-4662-9186-0035c78a5a24",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n    \"highSchool\": {\n        \"French\": {\n            \"Baccalaureat (BAC)\": {\n                \"Séries Littéraires\": {\n                    \"A1\": [\"Lettres, Latin, Grec\"],\n                    \"A2\": [\"Lettres, Latin, Langues vivantes II\"],\n                    \"A3\": [\"Lettres, Latin\"],\n                    \"A4\": [\"Lettres, Langues Vivantes II, Philosophie\"],\n                    \"A5\": [\"Langues vivantes II, Langues vivantes III\"],\n                    \"ABI\": [\"Lettres Bilingues\"],\n                    \"SH\": [\"Sciences humaines\"],\n                    \"AC\": [\"Art et cinématographie\"]\n                },\n                \"Séries Artistiques\": {\n                    \"SH\": [\"Art et cinématographie\"]\n                },\n                \"Séries Scientifiques\": {\n                    \"C\": [\"Physique-Chimie, Mathématiques\"],\n                    \"D\": [\"Mathématiques, Sciences de la vie et de la terre, Education à l'environnement, Hygiène et biotechnologie\"],\n                    \"E\": [\"Mathématiques, Techniques\"],\n                    \"TI\": [\"Technologie de l'information\"]\n                },\n                \"Séries Techniques Industrielles\": {\n                    \"AF1\": [\"Artistique (céramique)\"],\n                    \"AF2\": [\"Artistique (Peinture)\"],\n                    \"AF3\": [\"Artistique (Sculpture)\"],\n                    \"CI\": [\"Chimie Industrielle\"],\n                    \"F1\": [\"Fabrication Mécanique\"],\n                    \"F2\": [\"Electronique\"],\n                    \"F3\": [\"Electrotechnique\"],\n                    \"F4/BA\": [\"Génie civil (Bâtiment)\"],\n                    \"F4/BE\": [\"Génie civil (Bureau d'études)\"],\n                    \"F4/TP\": [\"Génie civil (Travaux publics)\"],\n                    \"F5\": [\"Froid et Climatisation\"],\n                    \"F6/BIPE\": [\"Génie Chimique (bio-procédés et pétrochimie)\"],\n                    \"F6/COPH\": [\"Génie Chimique (Cosmétique et Pharmacie)\"],\n                    \"F6/MIPE\": [\"Génie chimique (Mines et Pétrole)\"],\n                    \"F7/Biolo\": [\"Sciences et techniques biologiques (Biologie appliquée)\"],\n                    \"F7/Bioch\": [\"Sciences et techniques biologiques (Biotechnologie)\"],\n                    \"F8\": [\"Sciences et technologies de la santé et du social\"]\n                },\n                \"Séries STT\": {\n                    \"ACA\": [\"Action et communication administratives\"],\n                    \"CG\": [\"Comptabilité et gestion\"],\n                    \"ACC\": [\"Action et communication commerciales\"],\n                    \"FIG\": [\"Fiscalité et informatique de gestion\"],\n                    \"SES\": [\"Sciences économiques et sociales\"]\n                }\n            },\n            \"Brevet Technique (BT)\": {\n                \"Hôtellerie\": {\n                    \"HO-HE\": [\"Hotellerie (Hébergement)\"],\n                    \"HO-RB\": [\"Hotellerie (Restaurant-Bar)\"],\n                    \"HO-CU\": [\"Hotellerie (Cuisine)\"]\n                },\n                \"Tourisme\": {\n                    \"TO-AAT\": [\"Accueil et animation touristique\"],\n                    \"TO-AV\": [\"Agence de voyage\"],\n                    \"TAC\": [\"Tourisme (Agent de Comptoir)\"],\n                    \"TGT\": [\"Tourisme (Guide Touristique)\"]\n                },\n                \"Agriculture\": {\n                    \"TAG/PM\": [\"Production de monogastriques\"],\n                    \"TAG/PP\": [\"Production de Polygastriques\"],\n                    \"TAG/AQ\": [\"Production aquatique\"],\n                    \"TAG/PMF\": [\"Production de maraîchers et fourrage\"],\n                    \"TAG/PRT\": [\"Production de racines et tubercules\"],\n                    \"TAG/PCP\": [\"Production de cultures pérennes\"],\n                    \"TAG/PCLC\": [\"Production de céréales, légumineuses à graines et champignons\"],\n                    \"TAG/PPS\": [\"Production de plantes et semences\"],\n                    \"TAG/MEA\": [\"Maintenance des équipements agricoles\"],\n                    \"TAG/TCPA\": [\"Transformation et conservation de produits agropastoraux\"],\n                    \"AG/PA\": [\"Production Animale\"],\n                    \"AG/PV\": [\"Production Végétale\"]\n                },\n                \"Autres Techniques\": {\n                    \"TGF\": [\"Technique et gestion financière\"],\n                    \"BIJO\": [\"Bijouterie - joaillerie\"],\n                    \"GT\": [\"Géomètre topographe\"],\n                    \"GT/PH\": [\"Géomètre Topographe (Photogrammétrie)\"],\n                    \"GT/TO\": [\"Géomètre Topographe, (Topographe)\"],\n                    \"IB-TMG\": [\"Industrie du bois (transformation mécanique)\"],\n                    \"IH\": [\"Industrie d'habillement\"],\n                    \"IS\": [\"Installation sanitaire\"],\n                    \"IS/RH\": [\"Installation sanitaire et réseau hydraulique\"],\n                    \"CMA/MVT\": [\"Maintenance des véhicules de tourisme\"],\n                    \"CMA/MVPL\": [\"Maintenance de véhicules poids lourds\"],\n                    \"AMEB\": [\"Ameublement ébénisterie\"],\n                    \"MAGE\": [\"Menuiserie agencement\"],\n                    \"MEM\": [\"Maintenance électromécanique\"],\n                    \"MHB\": [\"Maintenance hospitalière / biomédicale\"],\n                    \"MISE\": [\"Maintenance et installation des systèmes électroniques\"],\n                    \"EF\": [\"Exploitation Forestière\"],\n                    \"ESF\": [\"Economie Sociale et Familiale\"],\n                    \"MA\": [\"Mécanique Automobile\"],\n                    \"MAV\": [\"Maintenance des Equipements Audio-visuels\"],\n                    \"MEB\": [\"Menuiserie - Ebenisterie\"],\n                    \"MF/CM\": [\"Métaux en feuille et Construction Métallique\"]\n                }\n            }\n        },\n        \"English\": {\n            \"GCE A-level\": {\n                \"Science Series\": {\n                    \"S1\": [\"Chemistry, Physics, Pure Mathematics\"],\n                    \"S2\": [\"Chemistry, Physics, Biology\"],\n                    \"S3\": [\"Biology, Chemistry, Mathematics\"],\n                    \"S4\": [\"Biology, Chemistry, Geology\"],\n                    \"S5\": [\"Chemistry, Computer Science, Mathematics\"],\n                    \"S6\": [\"Chemistry, Physics, Mathematics, Further Mathematics\"],\n                    \"S7\": [\"Biology, Chemistry, Physics, Mathematics\"],\n                    \"S8\": [\"Biology, Chemistry, Physics, Mathematics, Further Mathematics\"]\n                },\n                \"Arts and social sciences Series\": {\n                    \"A1\": [\"Literature, History, French\"],\n                    \"A2\": [\"History, Geography, Economics\"],\n                    \"A3\": [\"History, Economics, Literature\"],\n                    \"A4\": [\"Economics, Geography, Pure Mathematics\"],\n                    \"A5\": [\"Literature, History, Philosophy\"]\n                }\n            },\n            \"TVE A-level\": {\n                \"Commercial Series\": {\n                    \"C1\": [\"Accounting, Economics, Business Management\"],\n                    \"C2\": [\"Economics, Business Management, Mathematics\"],\n                    \"C3\": [\"Accounting, Economics, Mathematics\"],\n                    \"C4\": [\"Business Management, Geography, Economics\"]\n                },\n                \"Technical Series\": {\n                    \"T1\": [\"Technical Drawing, Physics, Mathematics\"],\n                    \"T2\": [\"Technical Drawing, Chemistry, Mathematics\"],\n                    \"T3\": [\"Technical Drawing, Electronics, Mathematics\"]\n                },\n                \"Computer Science\": {\n                    \"CS1\": [\"Computer Science, Mathematics, Physics\"],\n                    \"CS2\": [\"ICT, Mathematics, Economics\"]\n                }\n            }\n        }\n    }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -540,
+        40
+      ],
+      "id": "b6c30dc6-154c-43ae-acdf-fb0c0bc44a5e",
+      "name": "Series Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\nconst input = $input.all()[0].json || {}; \nconst rawTexts = (input.chatInput || input.question || input.text || '').trim(); \nconst rawText = rawTexts.toLowerCase(); \nconst sessionId = input.sessionId || 'sess-' + Math.random().toString(36).slice(2,10); \nconst { franc } = require('franc'); // <-- note the destructuring \nconst langs = require('langs'); \n// Get the text from input JSON \n// Detect the language (ISO 639-3 code) \nconst langCode = franc(rawText); \n// Convert ISO code to readable language name \nlet langName; \ntry {\n  langName = langs.where(\"3\", langCode).name; \n} catch {\n  langName = \"Unknown\"; \n} \nreturn [{\n  json: {\n    input, \n    cleanedQuestion: rawText, \n    language_code: langCode, \n    language_name: langName, \n    sessionId, \n    // profile: input.profile || {}, \n    timestamp: new Date().toISOString() } }];\n\n/**const input = $input.all()[0].json || {};\nconst rawText = (input.chatInput || input.question || input.text || '').trim();\nconst sessionId = input.sessionId || 'sess-' + Math.random().toString(36).slice(2,10);\n\n// Add conversation history tracking\nconst chatHistory = input.chatHistory || [];\n\nreturn [{\n  json: {\n    rawText,\n    cleanedQuestion: rawText,\n    sessionId,\n    profile: input.profile || {},\n    timestamp: new Date().toISOString(),\n    conversationHistory: chatHistory,\n    // This helps memory node recognize it as a chat message\n    chatInput: rawText,\n    message: rawText\n  }\n}];**/\n\n// this part is for connecting with the UI\n\nconst message = $input.all()[0].json;\n\n// ✅ Extract data from message.body\nconst body = message.body || {};\nconsole.log(\"📦 Full request body:\", JSON.stringify(body));\n\n// Extract the query from inside body\nlet query = body.chatInput || body.message || body.query || body.text || '';\nconsole.log(\"🧪 Raw query:\", query);\n\n// ✅ Force to string if necessary\nif (typeof query !== 'string') {\n  try {\n    query = JSON.stringify(query);\n  } catch (err) {\n    query = '';\n  }\n}\n\n// ✅ Apply trim and lowercase\nquery = query.trim().toLowerCase();\n\nconsole.log(\"✅ Cleaned query:\", query);\n\nconst { franc } = require('franc'); // <-- note the destructuring \nconst langs = require('langs'); \n// Get the text from input JSON \n// Detect the language (ISO 639-3 code) \nconst langCode = franc(query); \n// Convert ISO code to readable language name \nlet langName; \ntry {\n  langName = langs.where(\"3\", langCode).name; \n} catch {\n  langName = \"Unknown\"; \n} \n\n// Session ID\nconst sessionId = body.sessionId || Math.random().toString(36).substring(2) + Date.now().toString(36);\n\nreturn {\n  json: {\n    originalMessage: body,\n    cleanedQuestion: query,\n    language_code: langCode, \n    language_name: langName, \n    sessionId,\n    timestamp: new Date().toISOString()\n  }\n};\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -980,
+        -180
+      ],
+      "id": "6922caab-3b77-4995-a2e5-4362c733c0d7",
+      "name": "Process Input"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{\n\"User Question (Always reply in the User Question’s language (except program names, where the name must stay exact as it is in the context).): \" + $('Process Input').item.json.cleanedQuestion\n}}\n",
+        "options": {
+          "systemMessage": "=🎓 IUC Academic Advisor – System Prompt (v3.0)\n\n🧭 ROLE & CORE IDENTITY\nYou are IUC’s official multilingual Academic Advisor and Orientation Counselor.\nYour purpose is to guide students toward the most suitable IUC academic programs based on their:\n    • educational background (high school or university)\n    • series or what they studied\n    • interests or wish to study.\nYou must act as a professional, empathetic, open to feedback, and knowledgeable advisor.\nAlways provide clear, accurate, and fact-based guidance.\nNever invent, translate, or mix program data.\n\n🧩 CONTEXT DATA AVAILABLE\nOnly use the CONTEXT DATA AVAILABLE to answer to questions nothing else. Never invent data and programs.\nYou have access to:\n    • Programs Data:\n{{ JSON.stringify($json.data, null, 2) }}\n    • High School Series Data:\n{{ JSON.stringify($json.highSchool, null, 2) }} \nBefore answering, explore these data thoroughly.\nEach series in High School Series Data defines:\n{\n  \"Language\": {\n    \"Diploma Level\": {\n      \"Category\": {\n        \"Series Code\": [\"Subject(s)\"]\n      }\n    }\n  }\n}\nEach “Series” defines possible subject areas — do not mix subjects from different series.\n\n⚙️ PRIMARY TASKS\n    1. Program Recommendation\nSuggest 3–5 relevant IUC programs that match the user’s series, diploma, or interests.\n    2. Program Information\nProvide precise details for any specific program (name, description, career paths, language of instruction).\nif the programs the user want information on doesnot exist, Say so. Do not invent.\nIf the user ask for a category of programs, provide what is relevant in the Program Data. Do not add what it is not in the Programs Data. If there is no programs that correspond, say \"Programs do not exist in that category\"\n\n    3. Academic Pathway Mapping\nExplain progression routes (High School → Undergraduate → Graduate) when relevant.\n    4. Program Listing Mode (NEW)\nIf the user explicitly asks to list or view programs (e.g., “show all BTS programs”, “list all programs in English”):\n        ◦ Do not filter by series or interests.\n        ◦ List all matching programs \n        ◦ For each program, display:\n            ▪ Program Name (exact — never translated)\n\n\n🚫 STRICT PROHIBITIONS\nYou must never:\n    • Invent or fabricate program names or details not found in Program Data.\n    • Translate program names even if it is in the description. \n    • Mix French and English programs in the same list except if asked.\n    • Use “%” symbols or repeat programs.\n    • Confuse subjects between different high school series.\n    • Recommend programs outside the detected education system.\n    • Present certifications/diplomas as academic programs.\n    • Include digits in program names or abbreviations.\n    • Take the user’s role (“you should choose…”); always speak as the advisor.\n\n✅ MANDATORY BEHAVIORS\n    • Verify every program exists in context data.\nAlways remove digits in the program names or abbreviations.\n    • Filter programs strictly by detected language system.\n    • Respond in the same language as the user’s question (see matrix below).\n    • Maintain program name integrity (exact case and spelling).\n    • Diversify recommendations (include short and long cycles where possible).\n    • Ask clarifying questions if input is ambiguous.\n    • Acknowledge missing data transparently (“I don’t have information for that program.”).\n    • Stay within academic guidance scope.\n\n🌍 LANGUAGE & LOCALIZATION RULES\n🧭 LANGUAGE HANDLING MATRIX (NEW – STRICT LOGIC)\nCase\nUser Situation\nResponse Language\nProgram Info Language\nProgram Name Language\n1\nUser writes in French\nFrench\nFrench\nFrench\n2\nUser writes in French and requests English programs\nFrench\nFrench\nEnglish\n3\nUser writes in French but did Anglophone education\nFrench\nFrench\nEnglish\n4\nUser writes in English\nEnglish\nEnglish\nEnglish\n5\nUser writes in English and requests French programs\nEnglish\nEnglish\nFrench\n6\nUser writes in English but did Francophone education\nEnglish\nEnglish\nFrench\n7\nUser writes in another language (not English/French) and requests English or French programs\nSame as question language\nSame as question language\nKeep program names in their native language (French or English)\nStrict rule: Never translate or modify program names.\n\n🧮 EDUCATION SYSTEM DETECTION\nEach program has a language field (\"FRANCAIS\" or \"ANGLAIS\").\nDetection Logic:\n    • Francophone System: Triggered by words like baccalauréat, Bac, bac, série A1–E, BT, BTS, DEUG, DUT, Licence...\n→ Recommend only \"FRANCAIS\" programs.\n    • Anglophone System: Triggered by words like GCE, A-Level, TVE, S1–S8, A1–A5, C1–C4, T1–T3, CS1–CS2...\n→ Recommend only \"ANGLAIS\" programs.\n    • Fallback: If no trigger is detected, use the language of the question to determine the system.\nNever mix programs from different systems or languages except if asked to do so.\n\n🧠 DECISION FRAMEWORK\nFor High School Graduates\n    • Example of Interactions. \nVERI IMPORTANT. It is only for the program recommendation question. It is not for other types of questions and never use the response sample for questions that have nothing to do with program recommendation:\n          Example 1 – Francophone User\n          User: \"J’ai fait la série D, quels programmes me conseillez-vous ?\"\n\n          Avec votre baccalauréat série D (Mathématiques, Sciences de la vie et de la terre, Education à l'environnement, Hygiène et biotechnologie), vous avez accès à plusieurs programmes scientifiques à l’IUC: \n\n          Example 2 – Anglophone User\n          User: \"I completed GCE A-Level S3. What can I study?\"\n          \n          Great! With your GCE A-Level S3 (Chemistry, Biology, Mathematics), here are some IUC programs that match your profile:\n\n\n    • Identify the user’s series (e.g., Série D, GCE A-Level S3, D, S3, ...).\n    • Match series subjects to related programs:\n        ◦ 3-subject series → use at least 2 subjects\n        ◦ 4-subject series → at least 3 subjects\n        ◦ 5-subject series → at least 4 subjects\n    • Filter by education system (Francophone vs. Anglophone).\n      • Provide diverse programs. Programs only programs that match the series subject. Add more if asked. Never add programs that do not match to the serie\n    • Never to the matching per 1 subject if the serie has more than 2 subjects\n    • Include:\n        ◦ at least one short-cycle program (BTS/HND) depending on the question or background\n        ◦ preparatory classes if it or that matches with the series\n        ◦ undergraduate programs if it or that matches with the series.\n\n    • Include at least one short-cycle or first-cycle program available immediately after high school.\nExamples: BTS, HND, preparatory classes, technical diplomas, specialized certificates, or any other short or applied professional program found in context.\n    • Include at least one long-cycle program (Bachelor/Licence or equivalent depending on the language) if it or that matches with the series and background.\n    • When relevant, include preparatory or foundation programs that bridge to advanced degrees.\n    • Do not limit recommendations to Bachelor or Licence programs unless no short-cycle or preparatory options exist in the context data.\n    • Never add programs that do not match the serie and their subjects.\n    • End with a concluding sentence which shows that the programs recommended are based on the subjects of the series. Also invite them to learn more on the programs recommended on IUC website OR ask if they want more programs.\n\n          For Higher Education Students\n              • Identify the user’s current diploma and suggest the next logical level (e.g., Bachelor → Master).\n              • Maintain field continuity unless user requests a change.\n              • Respect the same language system.\n              • For B.Tech → recommend MEngBY4 as the transition to Master of Engineering programs.\n\n📘 INFORMATION DELIVERY\nFor each program, display:\n    • Program Name: (exact, no translation. It has to be bold)\n    • Description: concise and factual\n    • Career Opportunities: summarized\n    • Language of Instruction: show according to **program name**, not query language:\n         - If program name is in English → “Langue d’instruction: Anglais” in the language of the query.\n         - If program name is in French → “Langue d’instruction: Français” in the language of the query.\n\nshow in the user’s language the language of the name of the program\nIf any detail is missing, clearly say so.\nEngineering is not the same as Technology. So the 2 tracks are different.\nProfessionnelle is not the same as Technologique. So the 2 tracks are different.\n\n💬 CONVERSATIONAL STYLE\n    • Tone: Friendly, professional, supportive, curious.\n    • Structure: Use bullets or numbered lists.\n    • Avoid excessive formatting, emojis, or all caps.\n    • Ask clarifying questions when needed.\n    • If you make an error, correct yourself transparently.\n     Forexample: “I apologize — I initially listed a program from the English track. Here are the correct French programs for your Série D.” and other correction.\n\n\n🧾 QUALITY CHECK BEFORE RESPONDING\n✅ Correct language used\n✅ Program names match context exactly\n✅ Language filter applied properly\n✅ No fabricated or repeated programs\n✅ Series–program match accurate\n✅ Clear, actionable, and structured response\n✅ Clarifying question if input ambiguous\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        40,
+        -220
+      ],
+      "id": "62cf415b-81fe-47ae-9dd0-939c1e646fbb",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orientation",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, Authorization"
+              },
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "name": "Access-Control-Max-Age",
+                "value": "86400"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1260,
+        -180
+      ],
+      "id": "0c777659-20c0-4067-98ef-e1bec1b0daee",
+      "name": "Webhook",
+      "webhookId": "9a101be7-b6eb-43a6-9365-558f53c91566"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mistralResponse = $input.all()[0].json;\nconst message = mistralResponse.data || mistralResponse.message || mistralResponse;\n\n// Return as plain text instead of JSON\n\nreturn {\n  json: {\n    output: message \n  }\n};\n\n//const mistralResponse = $input.all()[0].json;\n//const message = mistralResponse.data || mistralResponse.message || mistralResponse;\n\n// Convert to plain text while preserving formatting\n//const plainTextResponse = typeof message === 'string' \n//    ? message \n//    : JSON.stringify(message, null, 2);\n\n//return {\n//    output: plainTextResponse  // Return as plain text\n//};\n\n\n\n\n\n\n\n\n\n\n\n\n//const mistralResponse = $input.all()[0].json;\n//const message = mistralResponse.data || mistralResponse.message || mistralResponse;\n\n// Ensure we return a string for text/plain response\n//return {\n  //json: {\n  //  output: typeof message === 'string' ? message : JSON.stringify(message)\n // }\n//};\n\n//const mistralResponse = $input.all()[0].json;\n//const message = mistralResponse.output || mistralResponse.message || mistralResponse.data || mistralResponse;\n\n//return {\n//   This makes sure only plain string is sent to the frontend\n //  so the \"botResponse(data)\" works correctly\n//  text: typeof message === \"string\" ? message : JSON.stringify(message)\n//};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        -40
+      ],
+      "id": "a406ae4d-b5a8-4a4f-8811-733d7ba002c0",
+      "name": "Format Response"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Series Data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Process Input": {
+      "main": [
+        [
+          {
+            "node": "Series Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Process Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a9c87d63fcb8adbd55dd14d6a6914d9892704dc49701a7a71c8965e95e426c7d"
+  }
+}
