@@ -1,4 +1,4 @@
-# AI Academic Orientation Agent - Institut Universitaire de la Côte (IUC)
+# AI Academic Orientation Agent 
 
 An intelligent chatbot system that provides personalized academic guidance to students of IUC, using Mistral-7B LLM with FastAPI backend, n8n workflow automation, and responsive web interface.
 
@@ -28,14 +28,13 @@ An intelligent chatbot system that provides personalized academic guidance to st
 - Education system recognition (Francophone vs Anglophone)
 
 **Smart Data Processing**
-- Real-time IUC API integration with intelligent caching
+- Real-time school API integration with intelligent caching
 - HTML content extraction and summarization (3000+ chars → ~600 chars)
 - 7-day TTL cache with automatic refresh
 - "STAFF" entry filtering and data cleaning
 
 **Performance Optimized**
 - Content summarization reduces token usage by 70-80%
-- CPU-optimized Mistral-7B inference
 - Batch processing for efficient LLM operations
 - Mobile-responsive web interface
 
@@ -76,14 +75,9 @@ cd iuc-orientation-agent
 ```bash
 pip install fastapi uvicorn llama-cpp-python httpx python-multipart
 ```
-**Download Mistral model**
-```bash
-wget https://huggingface.co/mistral-7b-instruct-v0.1.Q4_K_M.gguf -O models/
-```
 
 2. Configure Environment
 ```bash
-export MODEL_PATH="models/mistral-7b-instruct-v0.1.Q4_K_M.gguf"
 export API_BASE_URL="https://iuc-api-aca.bitang.net/api"
 export ApiKey="your_iuc_api_key_here"
 ```
@@ -108,7 +102,6 @@ n8n start
 Create .env file:
 
 ini
-MODEL_PATH=models/mistral-7b-instruct-v0.1.Q4_K_M.gguf
 API_BASE_URL=https://iuc-api-aca.bitang.net/api
 API_KEY=your_iuc_api_key_here
 CACHE_TTL=604800
@@ -177,13 +170,13 @@ HND Programs
 
 ## API Endpoints
   |  Endpoint	           |   Method	|    Description
-  -----------------------|----------|--------------------------------------------
-  | /health	             |   GET	  | System status and cache information
-  | /api/context	       |   GET	  | Get cached academic data (n8n integration)
-  | /api/specialities	   |   GET	  | List all processed academic programs
-  | /api/raw-data	       |   GET	  | Debug endpoint for raw API data
-  | /api/processed-data	 |   GET	  | Debug endpoint for processed data
-  | /webhook/orientation |	 POST	  | Main chat endpoint (from web interface)
+  ---------------------------|---------------|--------------------------------------------
+  | /health	           |   GET         | System status and cache information
+  | /api/context	           |   GET         | Get cached academic data (n8n integration)
+  | /api/specialities	  |   GET	| List all processed academic programs
+  | /api/raw-data	           |   GET	| Debug endpoint for raw API data
+  | /api/processed-data	  |   GET	| Debug endpoint for processed data
+  | /webhook/orientation     |   POST	| Main chat endpoint (from web interface)
 
 - Sample Request:
 
