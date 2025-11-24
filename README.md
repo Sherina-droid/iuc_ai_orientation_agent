@@ -78,7 +78,7 @@ pip install fastapi uvicorn llama-cpp-python httpx python-multipart
 
 2. Configure Environment
 ```bash
-export API_BASE_URL="https://iuc-api-aca.bitang.net/api"
+export API_BASE_URL="enter_here"
 export ApiKey="your_iuc_api_key_here"
 ```
 
