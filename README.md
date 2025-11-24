@@ -102,7 +102,7 @@ n8n start
 Create .env file:
 
 ini
-API_BASE_URL=https://iuc-api-aca.bitang.net/api
+API_BASE_URL=enter_here
 API_KEY=your_iuc_api_key_here
 CACHE_TTL=604800
 
